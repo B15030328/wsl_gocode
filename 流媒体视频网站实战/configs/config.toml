@@ -1,0 +1,6 @@
+[mysql]
+    user="root"
+    pwd = "root"
+    address = "localhost"
+    port = "3306"
+    dbname = "streamvideo_server"
