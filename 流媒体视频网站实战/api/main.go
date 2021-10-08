@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"stream/dbopts"
-	"stream/session"
+	"stream/api/dbopts"
+	"stream/api/session"
 
 	"github.com/julienschmidt/httprouter"
 )

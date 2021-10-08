@@ -3,8 +3,8 @@ package dbopts
 import (
 	"database/sql"
 	"log"
-	"stream/defs"
-	"stream/utils"
+	"stream/api/defs"
+	"stream/api/utils"
 	"time"
 )
 

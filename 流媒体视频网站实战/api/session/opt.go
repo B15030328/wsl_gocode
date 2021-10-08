@@ -2,9 +2,9 @@ package session
 
 import (
 	"log"
-	"stream/dbopts"
-	"stream/defs"
-	"stream/utils"
+	"stream/api/dbopts"
+	"stream/api/defs"
+	"stream/api/utils"
 	"sync"
 	"time"
 )

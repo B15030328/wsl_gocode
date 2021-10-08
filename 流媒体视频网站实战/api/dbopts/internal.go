@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"strconv"
-	"stream/defs"
+	"stream/api/defs"
 	"sync"
 )
 

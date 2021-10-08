@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"stream/defs"
+	"stream/api/defs"
 )
 
 func sendErrorResponse(w http.ResponseWriter, errResp defs.ErrResponse) {

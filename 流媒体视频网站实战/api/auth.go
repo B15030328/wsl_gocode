@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"stream/defs"
-	"stream/session"
+	"stream/api/defs"
+	"stream/api/session"
 )
 
 var HEADER_FIELD_SESSION = "X-Session-Id"

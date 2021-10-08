@@ -5,9 +5,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"stream/dbopts"
-	"stream/defs"
-	"stream/session"
+	"stream/api/dbopts"
+	"stream/api/defs"
+	"stream/api/session"
 
 	"github.com/julienschmidt/httprouter"
 )
