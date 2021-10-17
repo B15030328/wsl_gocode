@@ -30,6 +30,7 @@ func streamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	defer video.Close()
 }
 
+// 上传视频处理函数
 func uploadHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	r.Body = http.MaxBytesReader(w, r.Body, MAX_UPLOAD_SIZE)
 	if err := r.ParseMultipartForm(MAX_UPLOAD_SIZE); err != nil {

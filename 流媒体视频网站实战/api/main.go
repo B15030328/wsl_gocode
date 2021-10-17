@@ -30,15 +30,23 @@ func registerRouter() *httprouter.Router {
 	r := httprouter.New()
 	r.POST("/user", CreateUser)
 	r.POST("/user/:user_name", Login)
-
+	r.GET("/user/:username", GetUserInfo)
+	r.POST("/user/:username/videos", AddNewVideo)
+	r.GET("/user/:username/videos", ListAllVideos)
+	r.DELETE("/user/:username/videos/:vid-id", DeleteVideo)
+	r.POST("/videos/:vid-id/comments", PostComment)
+	r.GET("/videos/:vid-id/comments", ShowComments)
 	return r
 
 }
 
+// func Prepare() {
+// 	session.LoadSessionsFromDB()
+// }
 func main() {
 	dbopts.Init()
 	session.Init()
 	router := registerRouter()
 	mh := NewMiddlewareHandler(router)
-	http.ListenAndServe(":8092", mh)
+	http.ListenAndServe(":8000", mh)
 }

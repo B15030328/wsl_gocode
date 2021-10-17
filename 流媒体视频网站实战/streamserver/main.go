@@ -45,8 +45,8 @@ func main() {
 
 	router := registerHandler()
 	mh := NewMiddlewareHandler(router, 2)
-	log.Println("server begin success, port:8093")
-	err := http.ListenAndServe(":8093", mh)
+	log.Println("server begin success, port:9000")
+	err := http.ListenAndServe(":9000", mh)
 	if err != nil {
 		log.Println("server begin err:", err)
 	}
