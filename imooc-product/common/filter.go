@@ -1,7 +1,12 @@
 // 拦截器服务
 package common
 
-import "net/http"
+import (
+	"errors"
+	"imooc-product/encrypt"
+	"log"
+	"net/http"
+)
 
 // 声明过滤处理函数
 type FilterHandle func(rw http.ResponseWriter, r *http.Request) error
@@ -44,4 +49,46 @@ func (f *Filter) Handle(webHandle webHandle) func(rw http.ResponseWriter, r *htt
 		}
 		webHandle(rw, r)
 	}
+}
+
+// 拦截器执行函数
+//统一验证拦截器，每个接口都需要提前验证
+func Auth(rw http.ResponseWriter, r *http.Request) error {
+	log.Println("执行验证")
+	err := checkUserInfo(r)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// cookie验证
+func checkUserInfo(r *http.Request) error {
+	// 获取cookie中的uid
+	uidCookie, err := r.Cookie("uid")
+	if err != nil {
+		log.Println("get uid cookie error")
+		return errors.New("get uid cookie error")
+	}
+	// 获取cookie中的sign
+	signCookie, err := r.Cookie("sign")
+	if err != nil {
+		log.Println("get sign cookie error")
+		return errors.New("get sign cookie error")
+	}
+	sign, err := encrypt.DePwdCode(signCookie.Value)
+	if err != nil {
+		log.Println("decoder sign cookie error")
+		return errors.New("decoder sign cookie error")
+	}
+	if checkInfo(uidCookie.Value, string(sign)) {
+		log.Println("身份验证成功，uid", uidCookie.Value)
+		return nil
+	}
+	return errors.New("身份校验失败！")
+}
+
+// 验证解密后的sign
+func checkInfo(checkStr, signStr string) bool {
+	return checkStr == signStr
 }
