@@ -19,7 +19,6 @@ func main() {
 
 	user1 := user{name: "chuyu", age: 18, grade: "研三"}
 	fmt.Println(user1)
-
 	// 使用场景
 	// 获取指针位置来修改值，获取偏移量来修改值
 	lo1 := (*string)(unsafe.Pointer(&user1))
@@ -29,6 +28,5 @@ func main() {
 	lo2 := (*string)(unsafe.Pointer(uintptr(unsafe.Pointer(&user1)) + unsafe.Sizeof(int(0)) + unsafe.Sizeof(string(""))))
 	*lo2 = "24"
 	fmt.Println(user1)
-
 	//slice和map的相互转话
 }
