@@ -3,6 +3,7 @@ package mysql
 import (
 	"imooc-product/models/define"
 	"log"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -70,4 +71,13 @@ func (ins *Instance) SelectAll() (productArray []*define.Product, err error) {
 		return nil, result.Error
 	}
 	return productArray, nil
+}
+
+func (ins *Instance) SubProductNum(productID int64) error {
+	result := ins.DB.Where("ID = ?", strconv.FormatInt(productID, 10)).Update("productNum", "productNum-1")
+
+	if result.Error != nil {
+		return result.Error
+	}
+	return result.Error
 }

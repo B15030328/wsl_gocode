@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"imooc-product/models/define"
 	"imooc-product/models/mysql"
+	"imooc-product/rabbitmq"
 	"imooc-product/services"
 	"os"
 	"path/filepath"
@@ -20,6 +22,7 @@ type ProductController struct {
 	ProductService services.ProductService
 	OrderService   services.OrderService
 	Session        *sessions.Sessions
+	RabbitMQ       *rabbitmq.RabbitMQ
 }
 
 var (
@@ -39,6 +42,7 @@ func (c *ProductController) BeforeActivation(b mvc.BeforeActivation) {
 		Expires: 600 * time.Minute,
 	})
 	c.Session = sess
+	c.RabbitMQ = rabbitmq.NewRabbitMQSimple("prod")
 }
 
 func (p *ProductController) GetGenerateHtml() {
@@ -104,54 +108,69 @@ func (p *ProductController) GetDetail() mvc.View {
 	}
 }
 
-func (p *ProductController) GetOrder() mvc.View {
+func (p *ProductController) GetOrder() []byte {
 	productString := p.Ctx.URLParam("productID")
 	userString := p.Ctx.GetCookie("uid")
-	productID, err := strconv.Atoi(productString)
+	productID, err := strconv.ParseInt(productString, 10, 64)
 	if err != nil {
 		p.Ctx.Application().Logger().Debug(err)
 	}
-	product, err := p.ProductService.GetProductByID(int64(productID))
+	// 采用消息队列的方式查询
+	userID, err := strconv.ParseInt(userString, 10, 64)
 	if err != nil {
 		p.Ctx.Application().Logger().Debug(err)
 	}
-	var orderID int64
-	showMessage := "抢购失败！"
-	//判断商品数量是否满足需求
-	if product.ProductNum > 0 {
-		//扣除商品数量
-		product.ProductNum -= 1
-		err := p.ProductService.UpdateProduct(product)
-		if err != nil {
-			p.Ctx.Application().Logger().Debug(err)
-		}
-		//创建订单
-		userID, err := strconv.Atoi(userString)
-		if err != nil {
-			p.Ctx.Application().Logger().Debug(err)
-		}
-
-		order := &define.Order{
-			UserId:      int64(userID),
-			ProductId:   int64(productID),
-			OrderStatus: define.OrderSuccess,
-		}
-		//新建订单
-		orderID, err = p.OrderService.InsertOrder(order)
-		if err != nil {
-			p.Ctx.Application().Logger().Debug(err)
-		} else {
-			showMessage = "抢购成功！"
-		}
+	message := define.NewMessage(userID, int64(productID))
+	byteMessage, err := json.Marshal(message)
+	if err != nil {
+		p.Ctx.Application().Logger().Debug(err)
 	}
-
-	return mvc.View{
-		Layout: "shared/productLayout.html",
-		Name:   "product/result.html",
-		Data: iris.Map{
-			"orderID":     orderID,
-			"showMessage": showMessage,
-		},
+	// 生产者sample模式
+	err = p.RabbitMQ.PublishSimple(string(byteMessage))
+	if err != nil {
+		p.Ctx.Application().Logger().Debug(err)
 	}
+	// product, err := p.ProductService.GetProductByID(int64(productID))
+	// if err != nil {
+	// 	p.Ctx.Application().Logger().Debug(err)
+	// }
+	// var orderID int64
+	// showMessage := "抢购失败！"
+	// //判断商品数量是否满足需求
+	// if product.ProductNum > 0 {
+	// 	//扣除商品数量
+	// 	product.ProductNum -= 1
+	// 	err := p.ProductService.UpdateProduct(product)
+	// 	if err != nil {
+	// 		p.Ctx.Application().Logger().Debug(err)
+	// 	}
+	// 	//创建订单
+	// 	userID, err := strconv.Atoi(userString)
+	// 	if err != nil {
+	// 		p.Ctx.Application().Logger().Debug(err)
+	// 	}
+
+	// 	order := &define.Order{
+	// 		UserId:      int64(userID),
+	// 		ProductId:   int64(productID),
+	// 		OrderStatus: define.OrderSuccess,
+	// 	}
+	// 	//新建订单
+	// 	orderID, err = p.OrderService.InsertOrder(order)
+	// 	if err != nil {
+	// 		p.Ctx.Application().Logger().Debug(err)
+	// 	} else {
+	// 		showMessage = "抢购成功！"
+	// 	}
+	// }
+	return []byte("true")
+	// return mvc.View{
+	// 	Layout: "shared/productLayout.html",
+	// 	Name:   "product/result.html",
+	// 	Data: iris.Map{
+	// 		"orderID":     orderID,
+	// 		"showMessage": showMessage,
+	// 	},
+	// }
 
 }

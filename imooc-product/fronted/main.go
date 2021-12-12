@@ -32,7 +32,6 @@ func main() {
 	proParty := app.Party("/product")
 	proParty.Use(middleware.AuthConProduct)
 	pro := mvc.New(proParty)
-
 	pro.Handle(new(controllers.ProductController))
 
 	app.Run(

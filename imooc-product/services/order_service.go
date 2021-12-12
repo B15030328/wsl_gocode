@@ -39,3 +39,14 @@ func (o *OrderService) GetAllOrder() ([]*define.Order, error) {
 func (o *OrderService) GetAllOrderInfo() ([]*define.Order, error) {
 	return o.Ins.SelectAllWithInfo()
 }
+
+//根据消息创建订单
+func (o *OrderService) InsertOrderByMessage(message *define.Message) (orderID int64, err error) {
+	order := &define.Order{
+		UserId:      message.UserID,
+		ProductId:   message.ProductID,
+		OrderStatus: define.OrderSuccess,
+	}
+	return o.InsertOrder(order)
+
+}
