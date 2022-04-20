@@ -1,4 +1,4 @@
-module fenbushi
+module snowflake
 
 go 1.17
 
