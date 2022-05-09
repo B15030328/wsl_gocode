@@ -2,6 +2,9 @@ package main
 
 import "fmt"
 
+func init() {
+	fmt.Println("测试 init")
+}
 func main() {
 	a := []int{1, 2, 3}
 	// var a = make([]int, 1, 10)
